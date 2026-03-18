@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroScan AI | Autism Screening & Awareness</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --primary-glow: #3b82f6;
+            --accent-glow: #8b5cf6;
+            --dark-bg: #0b0f1a;
+            --card-bg: #141b2d;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--dark-bg);
+            color: #e2e8f0;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Header */
+        .glass-header {
+            background: rgba(11, 15, 26, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.4s ease;
+        }
+
+        .glass-header.scrolled {
+            padding: 0.75rem 2rem;
+            background: rgba(11, 15, 26, 0.95);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* Interactive Buttons */
+        .btn-gradient {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .btn-gradient:hover:not(:disabled) {
+            box-shadow: 0 0 35px rgba(139, 92, 246, 0.6);
+            transform: translateY(-3px) scale(1.02);
+        }
+
+        /* Reveal & Zoom Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .hover-zoom {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hover-zoom:hover {
+            transform: scale(1.05) translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 20px rgba(59, 130, 246, 0.2);
+        }
+
+        /* Input Styles */
+        .input-futuristic {
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .input-futuristic:focus {
+            border-color: var(--primary-glow);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.2);
+            outline: none;
+        }
+
+        /* Feature Cards with Glow */
+        .feature-card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        /* Background Light Glows */
+        .bg-glow {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, transparent 70%);
+            filter: blur(80px);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Toast UI */
+        #toast {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            padding: 1rem 2rem;
+            background: #10b981;
+            color: white;
+            border-radius: 12px;
+            font-weight: 700;
+            z-index: 2000;
+            transform: translateX(150%);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        #toast.visible { transform: translateX(0); }
+
+        .step-number {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head> 
+<body>
+
+    <div id="toast">Data successfully transmitted!</div>
+
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed top-0 w-full z-50 glass-header px-8 py-5 flex justify-between items-center">
+        <div class="flex items-center space-x-2 cursor-pointer hover:opacity-80 transition" onclick="window.scrollTo(0,0)">
+            <div class="bg-blue-600 p-2 rounded-xl text-white shadow-lg shadow-blue-500/50">
+                <i data-lucide="brain-circuit"></i>
+            </div>
+            <span class="text-xl font-bold tracking-tighter uppercase text-white">NEURO<span class="text-blue-500">SCAN</span></span>
+        </div>
+        <div class="hidden md:flex items-center space-x-8 text-sm font-bold text-slate-400">
+            <a href="#about" class="hover:text-blue-500 transition-colors uppercase tracking-widest">About</a>
+            <a href="#features" class="hover:text-blue-500 transition-colors uppercase tracking-widest">Features</a>
+            <a href="#age-groups" class="hover:text-blue-500 transition-colors uppercase tracking-widest">Age Groups</a>
+            <a href="#how-to-use" class="hover:text-blue-500 transition-colors uppercase tracking-widest">How It Works</a>
+            <a href="#contact" class="hover:text-blue-500 transition-colors uppercase tracking-widest">Contact</a>
+            <a href="login.html" class="btn-gradient text-white px-7 py-3 rounded-xl font-bold tracking-tighter active:scale-95 transition-all">START SCREENING</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative pt-48 pb-32 px-8 text-center overflow-hidden">
+        <div class="bg-glow top-0 left-[-10%] opacity-50"></div>
+        <div class="bg-glow bottom-0 right-[-10%] opacity-30"></div>
+        
+        <div class="max-w-4xl mx-auto reveal active">
+            <span class="bg-blue-500/10 text-blue-400 border border-blue-500/20 px-5 py-2 rounded-full text-xs font-black uppercase tracking-widest mb-8 inline-block">AI-Powered Neural Screening</span>
+            <h1 class="text-6xl md:text-8xl font-extrabold text-white leading-[1.1] mb-8 tracking-tight">
+                Unlock Neural <br/> <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">Insights</span>
+            </h1>
+            <p class="text-xl text-slate-400 mb-12 max-w-2xl mx-auto leading-relaxed">Early detection and behavioral pattern matching using advanced artificial intelligence.</p>
+            <div class="flex flex-col sm:flex-row justify-center gap-6">
+                <a href="login.html" class="px-12 py-6 btn-gradient text-white rounded-2xl font-black text-lg flex items-center justify-center gap-2">BEGIN ASSESSMENT</a>
+                <a href="#how-to-use" class="px-12 py-6 bg-slate-800/50 border border-slate-700 text-white rounded-2xl font-black text-lg hover:bg-slate-700/50 transition-all">LEARN MORE</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-32 px-8 max-w-7xl mx-auto relative">
+        <div class="grid md:grid-cols-2 gap-20 items-center">
+            <div class="relative reveal hover-zoom">
+                <div class="overflow-hidden rounded-[48px] shadow-2xl border border-slate-700">
+                    <img src="https://images.unsplash.com/photo-1551076805-e1869033e561?auto=format&fit=crop&q=80&w=800" class="w-full object-cover" alt="Neural Map">
+                </div>
+                <div class="absolute -bottom-8 -right-8 btn-gradient text-white p-10 rounded-[32px] shadow-2xl">
+                    <p class="text-4xl font-black">92.4%</p>
+                    <p class="text-[10px] font-black uppercase tracking-widest opacity-80">Pattern Accuracy</p>
+                </div>
+            </div>
+            <div class="space-y-8 reveal">
+                <h2 class="text-5xl font-black uppercase text-white leading-tight">Neural <br/><span class="text-blue-500">Architecture</span></h2>
+                <p class="text-slate-400 text-lg leading-relaxed">
+                    Our platform utilizes deep learning to analyze behavioral benchmarks and social interaction patterns. We bridge the gap between intuition and data-driven screening.
+                </p>
+                <div class="grid grid-cols-1 gap-4">
+                    <div class="flex items-center space-x-4 p-5 rounded-2xl bg-slate-800/40 border border-slate-700/50 hover:border-blue-500/50 transition-colors">
+                        <i data-lucide="cpu" class="text-blue-400"></i>
+                        <span class="font-bold text-slate-200 uppercase text-sm tracking-tight">Adaptive Neural Processing</span>
+                    </div>
+                    <div class="flex items-center space-x-4 p-5 rounded-2xl bg-slate-800/40 border border-slate-700/50 hover:border-purple-500/50 transition-colors">
+                        <i data-lucide="lock" class="text-purple-400"></i>
+                        <span class="font-bold text-slate-200 uppercase text-sm tracking-tight">End-to-End Data Encryption</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Original Features Section -->
+    <section id="features" class="py-32 bg-[#080c14] px-8 relative overflow-hidden">
+        <div class="bg-glow top-0 right-0 opacity-20"></div>
+        <div class="max-w-7xl mx-auto relative z-10">
+            <div class="text-center mb-20 reveal">
+                <h2 class="text-5xl font-black uppercase text-white">Core <span class="text-blue-500">Capabilities</span></h2>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="p-10 rounded-[40px] feature-card hover-zoom reveal">
+                    <div class="bg-blue-500/10 w-16 h-16 rounded-2xl flex items-center justify-center mb-8 border border-blue-500/20">
+                        <i data-lucide="zap" class="text-blue-400 w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-white uppercase tracking-tighter">Fast Analysis</h3>
+                    <p class="text-slate-400 leading-relaxed text-sm">Real-time processing of assessment data for immediate preliminary results.</p>
+                </div>
+                <div class="p-10 rounded-[40px] feature-card hover-zoom reveal" style="transition-delay: 0.1s;">
+                    <div class="bg-purple-500/10 w-16 h-16 rounded-2xl flex items-center justify-center mb-8 border border-purple-500/20">
+                        <i data-lucide="file-text" class="text-purple-400 w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-white uppercase tracking-tighter">Secure Logs</h3>
+                    <p class="text-slate-400 leading-relaxed text-sm">Download encrypted risk factor reports for clinical consultation.</p>
+                </div>
+                <div class="p-10 rounded-[40px] feature-card hover-zoom reveal" style="transition-delay: 0.2s;">
+                    <div class="bg-green-500/10 w-16 h-16 rounded-2xl flex items-center justify-center mb-8 border border-green-500/20">
+                        <i data-lucide="bot" class="text-green-400 w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-4 text-white uppercase tracking-tighter">AI Assistant</h3>
+                    <p class="text-slate-400 leading-relaxed text-sm">Integrated system to guide users through the neurodiversity spectrum.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Visual Analytics & Documentation -->
+    <section id="visual-analytics" class="py-32 bg-slate-900/20 px-8">
+        <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center">
+            <div class="reveal">
+                <h2 class="text-4xl font-black text-white uppercase mb-6 leading-tight">Visual <span class="text-blue-500">Analytics</span></h2>
+                <p class="text-slate-400 text-lg mb-8 leading-relaxed">We provide a comprehensive graphical breakdown of neural behaviors, which you can export directly to Word documents.</p>
+                <ul class="space-y-4 mb-10">
+                    <li class="flex items-center gap-3 text-slate-300 font-bold"><i data-lucide="bar-chart-3" class="text-blue-400"></i> Heatmap Visualization</li>
+                    <li class="flex items-center gap-3 text-slate-300 font-bold"><i data-lucide="file-down" class="text-purple-400"></i> Export to Word Format</li>
+                </ul>
+            </div>
+            <div class="reveal bg-card-bg p-8 rounded-[40px] border border-white/5 shadow-2xl hover-zoom">
+                <div class="space-y-6">
+                    <div class="h-64 flex items-end justify-between gap-2 border-b border-slate-700 pb-2">
+                        <div class="bg-blue-500 w-full rounded-t-lg" style="height: 60%"></div>
+                        <div class="bg-purple-500 w-full rounded-t-lg" style="height: 85%"></div>
+                        <div class="bg-blue-400 w-full rounded-t-lg" style="height: 45%"></div>
+                        <div class="bg-indigo-600 w-full rounded-t-lg" style="height: 70%"></div>
+                    </div>
+                    <div class="flex justify-between text-[10px] font-black uppercase text-slate-500">
+                        <span>Social</span><span>Speech</span><span>Focus</span><span>Sensory</span>
+                    </div>
+                    <button class="w-full py-4 bg-slate-800 border border-slate-700 rounded-xl text-white font-black uppercase tracking-widest text-xs flex items-center justify-center gap-2 hover:bg-slate-700 transition">
+                        <i data-lucide="download"></i> Download Report (Word)
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Age-Specific Screening -->
+    <section id="age-groups" class="py-32 px-8 max-w-7xl mx-auto">
+        <div class="text-center mb-20 reveal">
+            <h2 class="text-5xl font-black uppercase text-white">Universal <span class="text-blue-500">Coverage</span></h2>
+            <p class="text-slate-500 mt-4 uppercase font-black tracking-widest">Tailored protocols for every life stage</p>
+        </div>
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="feature-card p-10 rounded-[40px] hover-zoom reveal">
+                <div class="w-16 h-16 bg-blue-500/10 rounded-2xl flex items-center justify-center mb-6"><i data-lucide="baby" class="text-blue-400 w-8 h-8"></i></div>
+                <h3 class="text-2xl font-bold text-white mb-4 uppercase">Children</h3>
+                <p class="text-slate-400 text-sm leading-relaxed mb-6">Developmental milestone tracking and early behavior analysis.</p>
+                <span class="text-[10px] font-black bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full uppercase">Ages 2 - 12</span>
+            </div>
+            <div class="feature-card p-10 rounded-[40px] hover-zoom reveal" style="transition-delay: 0.1s;">
+                <div class="w-16 h-16 bg-purple-500/10 rounded-2xl flex items-center justify-center mb-6"><i data-lucide="user" class="text-purple-400 w-8 h-8"></i></div>
+                <h3 class="text-2xl font-bold text-white mb-4 uppercase">Adults</h3>
+                <p class="text-slate-400 text-sm leading-relaxed mb-6">Workplace interaction patterns and executive function screening.</p>
+                <span class="text-[10px] font-black bg-purple-500/20 text-purple-400 px-3 py-1 rounded-full uppercase">Ages 18 - 55</span>
+            </div>
+            <div class="feature-card p-10 rounded-[40px] hover-zoom reveal" style="transition-delay: 0.2s;">
+                <div class="w-16 h-16 bg-green-500/10 rounded-2xl flex items-center justify-center mb-6"><i data-lucide="users" class="text-green-400 w-8 h-8"></i></div>
+                <h3 class="text-2xl font-bold text-white mb-4 uppercase">Seniors</h3>
+                <p class="text-slate-400 text-sm leading-relaxed mb-6">Specialized cognitive pattern assessment for later stages of life.</p>
+                <span class="text-[10px] font-black bg-green-500/20 text-green-400 px-3 py-1 rounded-full uppercase">Ages 55+</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- How to Use Section -->
+    <section id="how-to-use" class="py-32 bg-[#080c14] px-8 relative">
+        <div class="bg-glow top-0 left-0 opacity-10"></div>
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-24 reveal">
+                <h2 class="text-5xl font-black uppercase text-white leading-tight">System <span class="text-blue-500">Operation</span></h2>
+            </div>
+            <div class="grid md:grid-cols-4 gap-12">
+                <div class="relative reveal hover-zoom">
+                    <span class="step-number text-7xl font-black opacity-30 mb-4 block">01</span>
+                    <h4 class="text-xl font-bold text-white uppercase mb-3">Login</h4>
+                    <p class="text-slate-500 text-sm">Create an encrypted profile to secure your private data.</p>
+                </div>
+                <div class="relative reveal hover-zoom" style="transition-delay: 0.1s;">
+                    <span class="step-number text-7xl font-black opacity-30 mb-4 block">02</span>
+                    <h4 class="text-xl font-bold text-white uppercase mb-3">Assessment</h4>
+                    <p class="text-slate-500 text-sm">Complete the behavioral questionnaire in the dashboard.</p>
+                </div>
+                <div class="relative reveal hover-zoom" style="transition-delay: 0.2s;">
+                    <span class="step-number text-7xl font-black opacity-30 mb-4 block">03</span>
+                    <h4 class="text-xl font-bold text-white uppercase mb-3">AI Engine</h4>
+                    <p class="text-slate-500 text-sm">Our neural system analyzes inputs against clinical benchmarks.</p>
+                </div>
+                <div class="relative reveal hover-zoom" style="transition-delay: 0.3s;">
+                    <span class="step-number text-7xl font-black opacity-30 mb-4 block">04</span>
+                    <h4 class="text-xl font-bold text-white uppercase mb-3">Reports</h4>
+                    <p class="text-slate-500 text-sm">View graphical data and export professional Word reports.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-32 px-8">
+        <div class="max-w-5xl mx-auto">
+            <div class="grid md:grid-cols-2 gap-16 reveal">
+                <div>
+                    <h2 class="text-5xl font-black uppercase text-white mb-6 leading-tight">System <span class="text-blue-600">Contact</span></h2>
+                    <p class="text-slate-400 mb-10 text-lg">Reach out for technical documentation or support.</p>
+                    <div class="flex items-center space-x-5 p-5 bg-slate-800/40 rounded-2xl border border-slate-700 hover:border-blue-500 transition-colors">
+                        <i data-lucide="mail" class="text-blue-400"></i>
+                        <span class="font-bold text-slate-200">nexus@neuroscan.ai</span>
+                    </div>
+                </div>
+                <div class="bg-slate-800/40 p-10 rounded-[40px] border border-slate-700 shadow-2xl">
+                    <form id="contact-form" class="space-y-5">
+                        <input type="email" required placeholder="Email Address" class="w-full px-6 py-4 input-futuristic rounded-xl">
+                        <textarea required placeholder="Message..." rows="3" class="w-full px-6 py-4 input-futuristic rounded-xl"></textarea>
+                        <button type="submit" id="contact-btn" class="w-full py-5 btn-gradient text-white font-black rounded-xl uppercase tracking-widest text-sm">
+                            <span id="btn-text">Send Message</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-20 border-t border-slate-800 px-8 text-center text-slate-500">
+        <span class="font-bold tracking-tighter uppercase text-white block mb-4">NEUROSCAN AI</span>
+        <p class="text-xs uppercase tracking-[0.2em] font-black opacity-40">Privacy | Early Detection | Analysis</p>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        // Reveal animations on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => { 
+                if(entry.isIntersecting) entry.target.classList.add('active'); 
+            });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Smooth Navbar Scroll
+        document.querySelectorAll('nav a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    window.scrollTo({
+                        top: target.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Header Style Change on Scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('navbar');
+            if(window.scrollY > 50) nav.classList.add('scrolled');
+            else nav.classList.remove('scrolled');
+        });
+
+        // Contact Form Handlers
+        const contactForm = document.getElementById('contact-form');
+        const contactBtn = document.getElementById('contact-btn');
+        const btnText = document.getElementById('btn-text');
+        const toast = document.getElementById('toast');
+
+        contactForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            contactBtn.disabled = true;
+            btnText.innerText = "Transmitting...";
+            setTimeout(() => {
+                btnText.innerText = "Sent!";
+                toast.classList.add('visible');
+                contactForm.reset();
+                setTimeout(() => {
+                    toast.classList.remove('visible');
+                    contactBtn.disabled = false;
+                    btnText.innerText = "Send Message";
+                }, 3000);
+            }, 1500);
+        });
+    </script>
+</body>
+</html>

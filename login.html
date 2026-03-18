@@ -1,0 +1,249 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | NeuroScan AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at center, #1e1b4b 0%, #020617 100%);
+            color: #f8fafc;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .login-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 40px rgba(59, 130, 246, 0.2);
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .login-card:hover {
+            box-shadow: 0 0 60px rgba(59, 130, 246, 0.3);
+        }
+
+        .neon-input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .neon-input:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .glow-button {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glow-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.6);
+        }
+
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100vh); }
+        }
+
+        .scanner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: rgba(59, 130, 246, 0.3);
+            box-shadow: 0 0 20px #3b82f6;
+            animation: scanline 4s linear infinite;
+            z-index: -1;
+        }
+
+        .success-overlay {
+            position: absolute;
+            inset: 0;
+            background: #020617;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+            z-index: 100;
+        }
+
+        .hidden-form {
+            display: none;
+        }
+
+        .animate-slide-up {
+            animation: slideUp 0.4s ease-out forwards;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scanner"></div>
+
+    <div id="authCard" class="login-card w-full max-w-md p-10 rounded-[40px] relative overflow-hidden">
+        
+        <!-- Success Animation Overlay -->
+        <div id="successOverlay" class="success-overlay">
+            <div class="text-center">
+                <div class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg shadow-green-500/50">
+                    <i data-lucide="check" class="text-white w-10 h-10"></i>
+                </div>
+                <h2 id="successText" class="text-2xl font-bold">ACCESS GRANTED</h2>
+                <p class="text-slate-400">Redirecting to Home System...</p>
+            </div>
+        </div>
+
+        <div class="absolute -top-20 -right-20 w-40 h-40 bg-blue-600/20 blur-[60px] rounded-full"></div>
+
+        <!-- Login Form Section -->
+        <div id="loginSection" class="animate-slide-up">
+            <div class="text-center mb-10">
+                <div class="inline-flex bg-blue-600 p-3 rounded-2xl mb-6 shadow-lg shadow-blue-500/50">
+                    <i data-lucide="brain-circuit" class="text-white w-8 h-8"></i>
+                </div>
+                <h1 class="text-3xl font-black tracking-tight mb-2 uppercase">System Login</h1>
+                <p class="text-slate-500 font-medium">Access using your own identity.</p>
+            </div>
+
+            <form onsubmit="handleAuth(event, 'login')" class="space-y-6">
+                <div class="space-y-2">
+                    <label class="text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">Identity (Email)</label>
+                    <input type="text" placeholder="name@example.com" required 
+                        class="neon-input w-full px-6 py-4 rounded-2xl text-white outline-none">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">Secure Key (Password)</label>
+                    <input type="password" placeholder="••••••••" required 
+                        class="neon-input w-full px-6 py-4 rounded-2xl text-white outline-none">
+                </div>
+                <button type="submit" class="glow-button auth-btn w-full py-5 rounded-2xl font-black text-lg tracking-widest flex items-center justify-center space-x-2">
+                    <span>INITIALIZE LOGIN</span>
+                    <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                </button>
+            </form>
+
+            <div class="mt-8 text-center space-y-4">
+                <div class="flex items-center justify-center space-x-2 text-sm">
+                    <span class="text-slate-600">Don’t have an account?</span>
+                    <button onclick="toggleForms()" class="text-blue-500 font-bold hover:underline">Sign up</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Signup Form Section (Initially Hidden) -->
+        <div id="signupSection" class="hidden-form animate-slide-up">
+            <div class="text-center mb-10">
+                <div class="inline-flex bg-purple-600 p-3 rounded-2xl mb-6 shadow-lg shadow-purple-500/50">
+                    <i data-lucide="user-plus" class="text-white w-8 h-8"></i>
+                </div>
+                <h1 class="text-3xl font-black tracking-tight mb-2 uppercase">New Registry</h1>
+                <p class="text-slate-500 font-medium">Create new account</p>
+            </div>
+
+            <form onsubmit="handleAuth(event, 'signup')" class="space-y-5">
+                <div class="space-y-2">
+                    <label class="text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">Full Name</label>
+                    <input type="text" placeholder="John Doe" required 
+                        class="neon-input w-full px-6 py-4 rounded-2xl text-white outline-none">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">Email Identity</label>
+                    <input type="email" placeholder="name@example.com" required 
+                        class="neon-input w-full px-6 py-4 rounded-2xl text-white outline-none">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-xs font-bold uppercase tracking-widest text-slate-400 ml-1">New Key</label>
+                    <input type="password" placeholder="••••••••" required 
+                        class="neon-input w-full px-6 py-4 rounded-2xl text-white outline-none">
+                </div>
+                <button type="submit" class="glow-button auth-btn w-full py-5 rounded-2xl font-black text-lg tracking-widest flex items-center justify-center space-x-2">
+                    <span>CREATE IDENTITY</span>
+                    <i data-lucide="sparkles" class="w-5 h-5"></i>
+                </button>
+            </form>
+
+            <div class="mt-8 text-center space-y-4">
+                <div class="flex items-center justify-center space-x-2 text-sm">
+                    <span class="text-slate-600">Already registered?</span>
+                    <button onclick="toggleForms()" class="text-blue-500 font-bold hover:underline">Login System</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Background Decoration -->
+    <div class="fixed top-10 left-10 w-64 h-64 bg-purple-600/10 rounded-full blur-[100px] -z-10"></div>
+    <div class="fixed bottom-10 right-10 w-80 h-80 bg-blue-600/10 rounded-full blur-[100px] -z-10"></div>
+
+    <script>
+        lucide.createIcons();
+
+        function toggleForms() {
+            const login = document.getElementById('loginSection');
+            const signup = document.getElementById('signupSection');
+            
+            if (login.classList.contains('hidden-form')) {
+                login.classList.remove('hidden-form');
+                signup.classList.add('hidden-form');
+            } else {
+                login.classList.add('hidden-form');
+                signup.classList.remove('hidden-form');
+            }
+        }
+
+        function handleAuth(event, type) {
+            event.preventDefault();
+            
+            const overlay = document.getElementById('successOverlay');
+            const successText = document.getElementById('successText');
+            const btn = event.target.querySelector('button');
+            
+            btn.innerHTML = '<span>PROCESSING...</span>';
+            btn.disabled = true;
+            btn.style.opacity = "0.7";
+
+            setTimeout(() => {
+                if (type === 'signup') {
+                    successText.innerText = "IDENTITY CREATED";
+                } else {
+                    successText.innerText = "ACCESS GRANTED";
+                }
+                
+                overlay.style.opacity = "1";
+                overlay.style.pointerEvents = "auto";
+                
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1500);
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
